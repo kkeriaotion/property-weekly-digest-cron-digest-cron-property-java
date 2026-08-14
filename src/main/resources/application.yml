@@ -1,0 +1,15 @@
+server:
+  port: ${PORT:8080}
+
+digest:
+  recipient: ${DIGEST_RECIPIENT:manager@example.com}
+  property-name: ${PROPERTY_NAME:Maple Court}
+  task-url: ${DIGEST_TASK_URL:http://localhost:8080/digests/weekly/send}
+  cron-expr: ${DIGEST_CRON_EXPR:0 9 * * 1}
+
+spring:
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
