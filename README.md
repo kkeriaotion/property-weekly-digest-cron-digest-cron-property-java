@@ -67,3 +67,7 @@ The code stays simple on purpose — here's what to set up before going live: Th
 **Property Weekly Digest Cron Digest Cron Property Java: Scheduled / background work**
 - **Property Weekly Digest Cron Digest Cron Property Java:** Server-side jobs keep running and **consuming credit** — monitor `GET /v1/account/usage` and set an auto-recharge threshold.
 - **Property Weekly Digest Cron Digest Cron Property Java:** Make handlers idempotent and use the queue's ack/retry so a redelivery doesn't double-process.
+
+## Further reading
+
+- [Rate-Limited Email and SMS Reminders Explained: Queue Batch Retention for Recovery](docs/rate-limited-email-and-sms-reminders-explained-qu-1phdpg.md)
