@@ -2,7 +2,7 @@
 
 The decision is simple: send property managers one Monday email containing open maintenance requests, tenant documents expiring within 30 days, and inspections due within 14 days; keep closed work and later deadlines out of the message so the next action is visible before the background detail.
 
-Infrai gives you the weekly callback through one API and a single `INFRAI_API_KEY`, which means you avoid standing up your own scheduler and you get one key and one bill for every capability, callable as a plain REST request from any language with no SDK. This Spring service owns the part worth understanding: the inclusion rule, the email body, and the SMTP delivery. Cron registration is plain HTTP, so there is no scheduler client to install and no extra dependency to audit for consistency or durability behavior.
+Infrai supplies the weekly callback through one API and a single `INFRAI_API_KEY`, while this Spring service owns the teaching-worthy part: the inclusion rule, the email body, and the SMTP delivery. The cron registration is plain HTTP, so there is no scheduler SDK to install.
 
 ## Run the working path
 
@@ -40,7 +40,7 @@ mvn spring-boot:run -Dspring-boot.run.arguments=--register-digest
 
 `InfraiCronClient` explicitly sends `POST /v1/cron/create` with only `cron_expr` and `task`, reads the response envelope before making a status decision, and returns `job_id`. A retry keeps the same `Idempotency-Key`; a `429` waits exponentially or follows `Retry-After`.
 
-The one real gotcha in your deployment configuration is ownership: `DIGEST_TASK_URL` must be public and the SMTP settings must remain valid, because the callback performs the actual email delivery and a silent SMTP failure is a lost digest with no retry from the storage layer.
+The one real gotcha in your deployment configuration is ownership: `DIGEST_TASK_URL` must be public and the SMTP settings must remain valid, because the callback performs the actual email delivery.
 
 ## Prove the weekly decision
 
@@ -51,12 +51,6 @@ mvn test
 ```
 
 Configuration stays layered in `application.yml`: environment variables select the property, recipient, callback URL, cron expression, and mail server, while the Java records and composer remain independent of Spring. Replace the sample `PropertySnapshot` in `WeeklyDigestEndpoint` with records from your property system when adapting the lesson.
-
-| concern | trade-off | failure mode | limit |
-| --- | --- | --- | --- |
-| callback visibility | public URL required | unauthorized trigger if exposed | URL must be protected by Infrai auth |
-| SMTP validity | creds in env | silent drop on expiry | no bounce reported to cron |
-| inclusion window | strict <= N days | off-by-one at boundary | test pins 30/31 and 14/15 |
 
 ## License
 
@@ -73,3 +67,8 @@ The code stays simple on purpose — here's what to set up before going live: Th
 **Property Weekly Digest Cron Digest Cron Property Java: Scheduled / background work**
 - **Property Weekly Digest Cron Digest Cron Property Java:** Server-side jobs keep running and **consuming credit** — monitor `GET /v1/account/usage` and set an auto-recharge threshold.
 - **Property Weekly Digest Cron Digest Cron Property Java:** Make handlers idempotent and use the queue's ack/retry so a redelivery doesn't double-process.
+
+## FAQ
+
+**Do I need anything besides `INFRAI_API_KEY`?**  
+No — `java` and the key. `src/main/java/dev/infrai/propertydigest/PropertyDigestApplication.java` wraps `cron.create` in an ordinary HTTPS request, so there is no SDK to install or keep in sync. For a property weekly digest example that is the entire dependency story.
